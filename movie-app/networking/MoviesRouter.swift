@@ -37,7 +37,7 @@ enum MoviesRouter: URLRequestConvertible {
         case .get, .find, .popular: return []
         case .byGenre(let genre, let page):
             return [
-                URLQueryItem(name: "genreID", value: String(genre.id)),
+                URLQueryItem(name: "genre_id", value: String(genre.id)),
                 URLQueryItem(name: "page", value: String(page))
             ]
         case .search(let query, let page):
