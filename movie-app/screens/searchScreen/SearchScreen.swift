@@ -14,33 +14,41 @@ struct SearchScreen: View {
         BackgroundView {
             VStack {
                 NavigationBarView(title: "Search 🔎")
-                VStack {
-                    MoviesSearchField(
-                        searchText: $searchScreenVM.searchText,
-                        isLoading: $searchScreenVM.isLoading
-                    )
-                    ScrollView {
-                        VStack {
-                            HStack {
-                                Text(searchScreenVM.isSearchTextEmpty ? "Most popular movies" : "Results for: \(searchScreenVM.trimmedSearchText)")
-                                    .font(.title2)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            MoviesGrid(
-                                movies: searchScreenVM.movies,
-                                selectedMovie: $searchScreenVM.selectedMovie,
-                                onMovieAppear: { visibleMovie in
-                                    searchScreenVM.tryFetchMoreMovies(currentVisibleMovie: visibleMovie)
+                if searchScreenVM.networkError != nil {
+                    NetworkErrorView(onRetryBtnClick: searchScreenVM.fetchMovies)
+                } else {
+                    VStack {
+                        MoviesSearchField(
+                            searchText: $searchScreenVM.searchText,
+                            isLoading: $searchScreenVM.isLoading
+                        )
+                        ScrollView {
+                            VStack {
+                                HStack {
+                                    Text(searchScreenVM.isSearchTextEmpty ? "Most popular movies" : "Results for: \(searchScreenVM.trimmedSearchText)")
+                                        .font(.title2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                    Spacer()
                                 }
-                            )
+                                MoviesGrid(
+                                    movies: searchScreenVM.movies,
+                                    selectedMovie: $searchScreenVM.selectedMovie,
+                                    onMovieAppear: { visibleMovie in
+                                        searchScreenVM.tryFetchMoreMovies(currentVisibleMovie: visibleMovie)
+                                    }
+                                )
+                            }
                         }
-                    }
-                    
-                }.padding(.horizontal)
+                        
+                    }.padding(.horizontal)
+                }
+                
                 Spacer()
             }
+        }
+        .onTapGesture {
+            self.hideKeyboard()
         }
         .movieDetailFullScreenCover(selectedMovie: $searchScreenVM.selectedMovie)
         .onReceive(searchScreenVM.$searchText.dropFirst(), perform: { _ in
@@ -48,7 +56,7 @@ struct SearchScreen: View {
         })
         .onAppear(perform: {
             if searchScreenVM.movies.isEmpty {
-                searchScreenVM.fetchMostPopuplarMovies()
+                searchScreenVM.fetchMovies()
             }
         })
         

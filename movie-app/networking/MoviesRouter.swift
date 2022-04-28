@@ -50,9 +50,9 @@ enum MoviesRouter: URLRequestConvertible {
     
     func asURLRequest() throws -> URLRequest {
         var urlComponents = URLComponents()
-        urlComponents.scheme = "http"
-        urlComponents.host = "localhost"
-        urlComponents.port = 3000
+        urlComponents.scheme = networkScheme
+        urlComponents.host = networkHost
+        urlComponents.port = networkPort
         urlComponents.path = path
         urlComponents.queryItems = queryItems
         

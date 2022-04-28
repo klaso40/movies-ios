@@ -17,6 +17,10 @@ struct HomeScreen: View {
                     Spacer()
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
+                } else if (homeScreenVM.networkError != nil) {
+                    NetworkErrorView(
+                        onRetryBtnClick: homeScreenVM.fetchMovies
+                    )
                 } else {
                     ScrollView {
                         VStack(spacing: 30) {

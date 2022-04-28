@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class HomeScreenVM: ObservableObject {
     @Published var selectedMovie: Movie?
@@ -14,10 +15,23 @@ class HomeScreenVM: ObservableObject {
     @Published var upcomingMovies: [Movie] = []
     @Published var nowPlayingMovies: [Movie] = []
     @Published var isLoading = true
+    @Published var networkError: AFError?
+    
+    private let errorReachabilityManager = NetworkReachabilityManager(host: "www.google.com")
+
+    func waitForReachableNetworkAndTryAgain() {
+        errorReachabilityManager?.startListening(onUpdatePerforming: { status in
+            if status == .reachable(.ethernetOrWiFi) || status == .reachable(.cellular) {
+               
+                self.fetchMovies()
+                self.errorReachabilityManager?.stopListening()
+            }
+        })
+    }
 
     
-    
     func fetchMovies() {
+        self.networkError = nil
         isLoading = true
         NetworkManager.session
             .request(MoviesRouter.get)
@@ -33,9 +47,8 @@ class HomeScreenVM: ObservableObject {
                     self.upcomingMovies = moviesResponse.upcomingMovies
                     self.nowPlayingMovies = moviesResponse.nowPlayingMovies
                 case .failure(let error):
-                    print(NetworkManager.isInternetAvailable)
-                    print(error.responseCode)
-                    print(error.localizedDescription)
+                    self.networkError = error
+                    self.waitForReachableNetworkAndTryAgain()
                 }
             }
     }

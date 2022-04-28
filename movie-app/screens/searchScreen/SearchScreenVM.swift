@@ -6,18 +6,23 @@
 //
 
 import Foundation
+import Alamofire
 
 class SearchScreenVM: ObservableObject {
     @Published var searchText = ""
     @Published var selectedMovie: Movie?
     @Published var isLoading = true
     @Published var movies: [Movie] = []
+    @Published var networkError: AFError?
+    
+    private let errorReachabilityManager = NetworkReachabilityManager(host: "www.google.com")
+
     
     private var page = 1
     private var debouncer: Debouncer!
     
     init () {
-        debouncer = Debouncer.init(delayInSeconds: 1, callback: searchMovies)
+        debouncer = Debouncer.init(delayInSeconds: 1, callback: fetchMovies)
     }
     
     var isSearchTextEmpty: Bool {
@@ -28,19 +33,28 @@ class SearchScreenVM: ObservableObject {
         return searchText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
+    func waitForReachableNetworkAndTryAgain() {
+        errorReachabilityManager?.startListening(onUpdatePerforming: { status in
+            if status == .reachable(.ethernetOrWiFi) || status == .reachable(.cellular) {
+                self.fetchMovies()
+                self.errorReachabilityManager?.stopListening()
+            }
+        })
+    }
     
-    private func searchMovies() {
+    func fetchMovies() {
+        self.networkError = nil
         if !isSearchTextEmpty {
             page = 1
             movies = []
             print("Calling API with query \(trimmedSearchText)")
-            fetchMovies(query: trimmedSearchText, page: 1)
+            searchMovies(query: trimmedSearchText, page: 1)
         } else {
             fetchMostPopuplarMovies()
         }
     }
     
-    func fetchMostPopuplarMovies() {
+    private func fetchMostPopuplarMovies() {
         print("Fetching most popular movies")
         NetworkManager.session
             .request(MoviesRouter.popular)
@@ -52,6 +66,8 @@ class SearchScreenVM: ObservableObject {
                 case .success(let popularMovies):
                     self.movies = popularMovies
                 case .failure(let err):
+                    self.networkError = err
+                    self.waitForReachableNetworkAndTryAgain()
                     print(err.localizedDescription)
                 }
             }
@@ -63,7 +79,7 @@ class SearchScreenVM: ObservableObject {
         debouncer.call()
     }
     
-    func fetchMovies(query: String, page: Int) {
+    func searchMovies(query: String, page: Int) {
         isLoading = true
         NetworkManager.session
             .request(MoviesRouter.search(query: query, page: page))
@@ -75,6 +91,8 @@ class SearchScreenVM: ObservableObject {
                 case .success(let movies):
                     self.movies.append(contentsOf: movies)
                 case .failure(let err):
+                    self.networkError = err
+                    self.waitForReachableNetworkAndTryAgain()
                     print(err.localizedDescription)
                 }
             }
@@ -90,7 +108,7 @@ class SearchScreenVM: ObservableObject {
         // 20 is number of movies in reposne
         if page * 20 == visibleMovieIndex + 1 && !isSearchTextEmpty {
             page += 1
-            fetchMovies(query: trimmedSearchText, page: page)
+            searchMovies(query: trimmedSearchText, page: page)
         }
     }
 }

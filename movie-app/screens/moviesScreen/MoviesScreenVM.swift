@@ -15,18 +15,7 @@ class MoviesScreenVM: ObservableObject {
     @Published var movies: [Movie] = []
     @Published var networkError: AFError?
     
-    init() {
-        NetworkManager.reachibilityManager?.startListening(
-            onQueue: DispatchQueue.main,
-            onUpdatePerforming: { status in
-                print("From init \(status)")
-                if (status == .reachable(.cellular) || status  == .reachable(.ethernetOrWiFi)) && self.networkError != nil {
-                    self.fetchMovies()
-                    self.networkError = nil
-                }
-            })
-    }
-    
+    private let errorReachabilityManager = NetworkReachabilityManager(host: "www.google.com")
     private var page = 1
     
     func onGenreChange() {
@@ -35,8 +24,18 @@ class MoviesScreenVM: ObservableObject {
         fetchMovies()
     }
     
+    func waitForReachableNetworkAndTryAgain() {
+        errorReachabilityManager?.startListening(onUpdatePerforming: { status in
+            if status == .reachable(.ethernetOrWiFi) || status == .reachable(.cellular) {
+                self.fetchMovies()
+                self.errorReachabilityManager?.stopListening()
+            }
+        })
+    }
+    
     func fetchMovies() {
         isLoading = true
+        self.networkError = nil
         NetworkManager.session
             .request(MoviesRouter.byGenre(genre: selectedGenreFilter.genre, page: page))
             .validate()
@@ -49,7 +48,7 @@ class MoviesScreenVM: ObservableObject {
                     self.movies.append(contentsOf: movies)
                 case .failure(let err):
                     self.networkError = err
-                    print(err.responseCode)
+                    self.waitForReachableNetworkAndTryAgain()
                     print(err.localizedDescription)
                 }
             }

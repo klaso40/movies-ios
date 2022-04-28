@@ -9,6 +9,9 @@ import Foundation
 
 let defaultMovieImageURL: URL = URL(string:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80")!
 
+let networkScheme = "http"
+let networkHost = "192.168.50.123"
+let networkPort = 3000
 
 
 let availableGenres = [

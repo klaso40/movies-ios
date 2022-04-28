@@ -14,26 +14,31 @@ struct MoviesScreen: View {
             VStack {
                 NavigationBarView(title: "Movies 🎬")
                 MovieGenreFilter(selectedGenreFilter: $moviesScreenVM.selectedGenreFilter)
-                VStack {
-                    ScrollView {
-                        VStack {
-                            MoviesGrid(
-                                movies: moviesScreenVM.movies,
-                                selectedMovie: $moviesScreenVM.selectedMovie,
-                                onMovieAppear: { movie in
-                                    moviesScreenVM.tryFetchMoreMovies(currentVisibleMovie: movie)
+                
+                if moviesScreenVM.networkError != nil {
+                    NetworkErrorView(onRetryBtnClick: moviesScreenVM.fetchMovies)
+                } else {
+                    VStack {
+                        ScrollView {
+                            VStack {
+                                MoviesGrid(
+                                    movies: moviesScreenVM.movies,
+                                    selectedMovie: $moviesScreenVM.selectedMovie,
+                                    onMovieAppear: { movie in
+                                        moviesScreenVM.tryFetchMoreMovies(currentVisibleMovie: movie)
+                                    }
+                                )
+                                if moviesScreenVM.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .padding()
                                 }
-                            )
-                            if moviesScreenVM.isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .padding()
                             }
                         }
                     }
+                        .padding(.horizontal)
+                        .padding(.top)
                 }
-                    .padding(.horizontal)
-                    .padding(.top)
                 Spacer()
             }
         }

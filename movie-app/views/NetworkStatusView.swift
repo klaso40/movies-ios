@@ -48,9 +48,10 @@ struct NetworkStatusView: View {
                 .padding(.bottom, 80)
             }
             
-        }.onAppear {
+        }
+        .onAppear {
             NetworkManager.reachibilityManager?.startListening(
-                onQueue: DispatchQueue.main,
+                onQueue: DispatchQueue.global(qos: .background),
                 onUpdatePerforming: { status in
                     switch status {
                     case .reachable:
@@ -78,32 +79,6 @@ struct NetworkStatusView: View {
                     }
                 }
             )
-//            NetworkManager.reachibilityManager?.startListening { status in
-//                switch status {
-//                case .reachable:
-//                    withAnimation {
-//                        if networkAlert != nil {
-//                            self.networkAlert = reachableNetworkAlert
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//                                if networkAlert == reachableNetworkAlert {
-//                                    self.networkAlert = nil
-//                                }
-//                            }
-//                        }
-//                    }
-//                    print("reachable")
-//                case .notReachable:
-//                    withAnimation {
-//                        self.networkAlert = notReachableNetworkAlert
-//                    }
-//                    print("not reachable")
-//                case .unknown:
-//                    withAnimation {
-//                        self.networkAlert = nil
-//                    }
-//                    print("Unknow")
-//                }
-//            }
         }
     }
 }
