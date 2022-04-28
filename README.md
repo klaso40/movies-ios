@@ -2,7 +2,7 @@
 
 # Movies IOS
 
-## Funckie
+## Funkcie
  - vyhľadávanie filmov
  - filtrovanie podľa žánru
  - zobrazenie najlepšie hodnotených filmov
