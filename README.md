@@ -1,6 +1,6 @@
-![movies-app-icon](https://user-images.githubusercontent.com/42782393/165767936-40ac7a83-76dd-4b65-bd3d-dad6619b5c52.png)
-
 # Movies IOS
+
+![movies-app-icon](https://user-images.githubusercontent.com/42782393/165767936-40ac7a83-76dd-4b65-bd3d-dad6619b5c52.png)
 
 ## Funkcie
 
