@@ -16,6 +16,7 @@ struct MoviesSearchField: View {
             placeholder: Text("Search your movie...").foregroundColor(.gray),
             text: $searchText
         )
+            .foregroundColor(.white)
             .clearButton($searchText)
             .progressIndicator($isLoading)
             .padding()
