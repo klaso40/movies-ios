@@ -52,7 +52,12 @@ class MoviesScreenVM: ObservableObject {
                     self.movies.append(contentsOf: movies)
                 case .failure(let err):
                     self.networkError = err
-                    self.waitForReachableNetworkAndTryAgain()
+                    guard let isReachable = self.errorReachabilityManager?.isReachable else {
+                        return
+                    }
+                    if !isReachable {
+                        self.waitForReachableNetworkAndTryAgain()
+                    }
                     print(err.localizedDescription)
                 }
             }

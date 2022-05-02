@@ -52,7 +52,12 @@ class HomeScreenVM: ObservableObject {
                     self.nowPlayingMovies = moviesResponse.nowPlayingMovies
                 case .failure(let error):
                     self.networkError = error
-                    self.waitForReachableNetworkAndTryAgain()
+                    guard let isReachable = self.errorReachabilityManager?.isReachable else {
+                        return
+                    }
+                    if !isReachable {
+                        self.waitForReachableNetworkAndTryAgain()
+                    }
                 }
             }
     }

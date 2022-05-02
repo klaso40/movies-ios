@@ -62,6 +62,7 @@ class SearchScreenVM: ObservableObject {
         print("Fetching most popular movies")
         NetworkManager.session
             .request(MoviesRouter.popular)
+            .validate()
             .responseDecodable(of: [Movie].self) { response in
                 defer {
                     self.isLoading = false
@@ -71,7 +72,12 @@ class SearchScreenVM: ObservableObject {
                     self.movies = popularMovies
                 case .failure(let err):
                     self.networkError = err
-                    self.waitForReachableNetworkAndTryAgain()
+                    guard let isReachable = self.errorReachabilityManager?.isReachable else {
+                        return
+                    }
+                    if !isReachable {
+                        self.waitForReachableNetworkAndTryAgain()
+                    }
                     print(err.localizedDescription)
                 }
             }
@@ -87,6 +93,7 @@ class SearchScreenVM: ObservableObject {
         isLoading = true
         NetworkManager.session
             .request(MoviesRouter.search(query: query, page: page))
+            .validate()
             .responseDecodable(of: [Movie].self) { response in
                 defer {
                     self.isLoading = false
@@ -96,7 +103,12 @@ class SearchScreenVM: ObservableObject {
                     self.movies.append(contentsOf: movies)
                 case .failure(let err):
                     self.networkError = err
-                    self.waitForReachableNetworkAndTryAgain()
+                    guard let isReachable = self.errorReachabilityManager?.isReachable else {
+                        return
+                    }
+                    if !isReachable {
+                        self.waitForReachableNetworkAndTryAgain()
+                    }
                     print(err.localizedDescription)
                 }
             }
