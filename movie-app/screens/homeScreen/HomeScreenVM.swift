@@ -28,6 +28,10 @@ class HomeScreenVM: ObservableObject {
             }
         })
     }
+    
+    deinit {
+        errorReachabilityManager?.stopListening()
+    }
 
     
     func fetchMovies() {

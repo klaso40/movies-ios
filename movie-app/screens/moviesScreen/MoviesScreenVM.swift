@@ -18,6 +18,10 @@ class MoviesScreenVM: ObservableObject {
     private let errorReachabilityManager = NetworkReachabilityManager(host: "www.google.com")
     private var page = 1
     
+    deinit {
+        errorReachabilityManager?.stopListening()
+    }
+    
     func onGenreChange() {
         page = 1
         movies = []

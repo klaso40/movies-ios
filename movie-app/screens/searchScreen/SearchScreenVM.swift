@@ -25,6 +25,10 @@ class SearchScreenVM: ObservableObject {
         debouncer = Debouncer.init(delayInSeconds: 1, callback: fetchMovies)
     }
     
+    deinit {
+        errorReachabilityManager?.stopListening()
+    }
+    
     var isSearchTextEmpty: Bool {
         return trimmedSearchText.isEmpty
     }
