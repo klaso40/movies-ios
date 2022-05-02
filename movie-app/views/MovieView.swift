@@ -25,22 +25,16 @@ struct MovieView: View {
                             .resizable()
                             .scaledToFill()
                     } else if let _ = phase.error {
-                        VStack {
-                            Image(systemName: "exclamationmark.circle")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                                .foregroundColor(.red)
-                            Text("Image could not be loaded!")
-                                .fontWeight(.medium)
-                                .foregroundColor(.red)
-                                .multilineTextAlignment(.center)
-                        }
-                        
+                        Image("default_movie_image")
+                            .resizable()
+                            .scaledToFill()
                     } else {
                         ProgressView()
                     }
                     
                 }
+                    .frame(width: 150)
+                    .clipped()
                     .shadow(radius: 20)
                     .cornerRadius(20)
                 VStack {
@@ -74,6 +68,7 @@ struct MovieView: View {
             MovieRatingView(movie: movie)
         }
             .frame(width: 150, height: 280)
+            
            
     }
 }

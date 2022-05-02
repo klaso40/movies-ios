@@ -23,16 +23,9 @@ struct MovieDetailHeroView: View {
                         .resizable()
                         .scaledToFill()
                 } else if let _ = phase.error {
-                    VStack {
-                        Image(systemName: "exclamationmark.circle")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(.red)
-                        Text("Image could not be loaded!")
-                            .fontWeight(.medium)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                    }
+                    Image("default_movie_image")
+                        .resizable()
+                        .scaledToFill()
                 } else {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
